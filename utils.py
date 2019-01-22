@@ -11,6 +11,8 @@ load_dotenv()
 gmaps = googlemaps.Client(key=os.environ["GOOGLE_GEOCODING_API_KEY"])
 
 def html_table_to_df(html_path):
+    """Reads html "Wahlergebnisse" table into pandas DataFrame.
+    """
     
     with open(html_path, "r", encoding="utf-8") as html_f:
         html_content = html_f.read()
@@ -52,15 +54,12 @@ def html_table_to_df(html_path):
     df["location_id"] = df["Wahlbezirk"].map(extract_id)
     del df["Wahlbezirk"]
 
-    #df = df.set_index("location_id")
-
     return df
 
 
 def get_gps_from_location(df, address_col="location_address", suffix="Heilbronn"):
-
-    lat_list = list()
-    lon_list = list()
+    """Queries Google Geocoding API and returns GPS coordinates of PoIs.
+    """
 
     resp_dict = dict()
 
@@ -106,9 +105,10 @@ if __name__ == "__main__":
 
     html_path = "./data/wahlen17.html"
     df = html_table_to_df(html_path)
+
     print(df.head(10))
 
-    df = get_gps_from_google_json(df)
+    df = get_gps_from_google_json(df, json_map="data/geocode-results.json")
 
     print(df.head(10))
 
